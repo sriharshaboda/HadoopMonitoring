@@ -1,0 +1,9 @@
+select fetchDate, hour, queuename, round(avg(numactiveapplications)*10000) avgActiveApps, round(avg(numpendingapplications)*10000) avgPendingApps
+from (
+  select split(fetchtime, ' ')[0] fetchDate
+    , split(split(fetchtime, ' ')[1], '\\:')[0] hour
+    , queuename
+    , numactiveapplications
+    , numpendingapplications
+  from monitor.queues ) x
+group by fetchDate, hour, queuename
