@@ -66,14 +66,14 @@ public class HiveConnection {
 
             String insertDataQuery = "";
             if(tableName.equalsIgnoreCase("FINISHED_JOBS")){
-                insertDataQuery = "INSERT   INTO TABLE "+ tableName+" PARTITION(date, hour) SELECT id ,name , queue , username , state , submitTime , startTime , finishTime ,avgMapTime , avgReduceTime , avgShuffleTime , avgMergeTime , gcTime , usedMemory , timeSpentMaps , timeSpentReducers , timeSpentTotal ,totalFileBytesRead    ,totalFileBytesWritten   ,totalFileReadOps   ,totalFileLargeReadOps   ,totalFileWriteOps   ,totalHDFSBytesRead   ,totalHDFSBytesWritten   ,totalHDFSReadOps   ,totalHDFSLargeReadOps   ,totalHDFSWriteOps , fetchTime ,to_date(fetchTime), hour(fetchTime) FROM "+tableName+"_STG";
+                insertDataQuery = "INSERT   INTO TABLE "+ tableName+" PARTITION(fetchdate, fetchhour) SELECT id ,name , queue , username , state , submitTime , startTime , finishTime ,avgMapTime , avgReduceTime , avgShuffleTime , avgMergeTime , gcTime , usedMemory , timeSpentMaps , timeSpentReducers , timeSpentTotal ,totalFileBytesRead    ,totalFileBytesWritten   ,totalFileReadOps   ,totalFileLargeReadOps   ,totalFileWriteOps   ,totalHDFSBytesRead   ,totalHDFSBytesWritten   ,totalHDFSReadOps   ,totalHDFSLargeReadOps   ,totalHDFSWriteOps , fetchTime ,to_date(fetchTime), hour(fetchTime) FROM "+tableName+"_STG";
             }
             else if(tableName.equalsIgnoreCase("RUNNING_JOBS")){
-                insertDataQuery = "INSERT INTO TABLE "+ tableName+" PARTITION(date, hour) SELECT applicationId ,applicationName , applicationState , applicationType , finalState , progress , username , queueName  , startTime , elapsedTime , finishTime , trackingUrl , numContainers , allocatedMB , allocatedVCores , memorySeconds , vcoreSeconds  , fetchTime ,to_date(fetchTime), hour(fetchTime) FROM "+tableName+"_STG";
+                insertDataQuery = "INSERT INTO TABLE "+ tableName+" PARTITION(fetchdate, fetchhour) SELECT applicationId ,applicationName , applicationState , applicationType , finalState , progress , username , queueName  , startTime , elapsedTime , finishTime , trackingUrl , numContainers , allocatedMB , allocatedVCores , memorySeconds , vcoreSeconds  , fetchTime ,to_date(fetchTime), hour(fetchTime) FROM "+tableName+"_STG";
             }
 
             else if(tableName.equalsIgnoreCase("QUEUES")){
-                insertDataQuery = "INSERT INTO TABLE "+ tableName+" PARTITION(date, hour) SELECT queueName , absoluteAllocatedCapacity , absoluteUsedCapacity , usedMemory , usedCores , numContainers , queueState , maxApplications , numApplications , numActiveApplications , numPendingApplications  , queueType , users , fetchTime ,to_date(fetchTime), hour(fetchTime) FROM "+tableName+"_STG";
+                insertDataQuery = "INSERT INTO TABLE "+ tableName+" PARTITION(fetchdate, fetchhour) SELECT queueName , absoluteAllocatedCapacity , absoluteUsedCapacity , usedMemory , usedCores , numContainers , queueState , maxApplications , numApplications , numActiveApplications , numPendingApplications  , queueType , users , fetchTime ,to_date(fetchTime), hour(fetchTime) FROM "+tableName+"_STG";
             }
             System.out.println("insertDataQuery = " + insertDataQuery);
             stmt.executeUpdate(insertDataQuery);
