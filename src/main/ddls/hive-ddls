@@ -10,6 +10,9 @@ FIELDS TERMINATED BY '\t'
 LINES TERMINATED BY '\n'
 STORED AS TEXTFILE;
 
+
+
+
 CREATE TABLE IF NOT EXISTS FINISHED_JOBS (id String,name String, queue String, username String, state String, submitTime
 bigint, startTime bigint, finishTime bigint,avgMapTime bigint, avgReduceTime bigint, avgShuffleTime bigint, avgMergeTime bigint,
 gcTime bigint, usedPhysicalMemory bigint, cpuTimeSpentMaps bigint, cpuTimeSpentReducers bigint, cpuTimeSpentTotal bigint, vCoreSecondsMaps bigint,
