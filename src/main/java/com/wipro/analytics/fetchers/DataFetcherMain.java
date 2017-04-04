@@ -96,7 +96,7 @@ public class DataFetcherMain {
         InputStream input = null;
 
         try {
-            input = new FileInputStream(System.getenv("user.home")+"/config.properties");
+            input = new FileInputStream(System.getProperty("user.home")+"/config.properties");
             properties.load(input);
 
             // get the properties value
