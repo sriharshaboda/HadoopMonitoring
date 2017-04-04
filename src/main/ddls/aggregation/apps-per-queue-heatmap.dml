@@ -1,9 +1,31 @@
-select fetchDate, hour, queuename, round(avg(numactiveapplications)*10000) avgActiveApps, round(avg(numpendingapplications)*10000) avgPendingApps
-from (
-  select split(fetchtime, ' ')[0] fetchDate
-    , split(split(fetchtime, ' ')[1], '\\:')[0] hour
-    , queuename
-    , numactiveapplications
-    , numpendingapplications
-  from monitor.queues ) x
-group by fetchDate, hour, queuename
+-- to be run in hive
+
+create database if not exists reporting;
+use reporting;
+create table if not exists reporting.apps_per_queue (fetchdate date, fetchhour int, queuename string, avgActiveApps bigint, avgPendingApps bigint,absoluteusedcapacity double,usageestimate double, numcontainers bigint) row format delimited fields terminated by ',' STORED AS textfile;
+insert overwrite table reporting.apps_per_queue select fetchdate, fetchhour, queuename, avg(numactiveapplications) as avgactiveapps, avg(numpendingapplications) as avgpendingapps, round(avg(absoluteusedcapacity),2), round(avg(absoluteusedcapacity/absoluteallocatedcapacity),2), avg(numcontainers) from platmd.queues group by fetchdate, fetchhour,queuename;
+
+
+-- to be run in mysql
+
+ CREATE TABLE `apps_per_queue` (
+  `fetchdate` date DEFAULT NULL,
+  `fetchhour` int(11) DEFAULT NULL,
+  `queuename` varchar(40) DEFAULT NULL,
+  `numactiveapps` bigint(20) DEFAULT NULL,
+  `numpendingapps` bigint(20) DEFAULT NULL,
+  `absoluteusedcapacity` double DEFAULT NULL,
+  `usageestimate` double DEFAULT NULL,
+  `numcontainers` bigint DEFAULT NULL
+  )
+
+sqoop eval --connect jdbc:mysql://localhost:3306/reporting --username root --password '' --query 'TRUNCATE TABLE apps_per_queue'
+
+sqoop export \
+--connect jdbc:mysql://localhost:3306/reporting \
+--username root \
+--password '' \
+--table apps_per_queue  \
+--export-dir /apps/hive/warehouse/reporting.db/apps_per_queue \
+--driver com.mysql.jdbc.Driver \
+--input-fields-terminated-by ","
