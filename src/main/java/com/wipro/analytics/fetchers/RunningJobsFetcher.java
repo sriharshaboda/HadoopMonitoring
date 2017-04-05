@@ -4,6 +4,7 @@ import com.wipro.analytics.HiveConnection;
 import com.wipro.analytics.beans.RunningJobsInfo;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -20,7 +21,7 @@ import java.util.Calendar;
 /**
  * Created by cloudera on 3/15/17.
  */
-
+@DisallowConcurrentExecution
 public class RunningJobsFetcher implements Job {
 
     private final static String runningJobsFile = DataFetcherMain.RUNNING_JOBS_FILE;

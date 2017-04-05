@@ -4,6 +4,7 @@ import com.wipro.analytics.HiveConnection;
 import com.wipro.analytics.beans.FinishedJobsInfo;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -19,6 +20,7 @@ import java.util.Calendar;
 /**
  * Created by cloudera on 3/18/17.
  */
+@DisallowConcurrentExecution
 public class FinishedJobsFetcher implements Job {
     private static final long scheduleInterval = DataFetcherMain.SCHEDULE_INTERVAL;
     private static final long aggregationInterval = DataFetcherMain.AGGREGATION_INTERVAL;

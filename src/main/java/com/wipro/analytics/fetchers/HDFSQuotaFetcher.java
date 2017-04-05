@@ -6,6 +6,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ContentSummary;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -22,6 +23,7 @@ import java.util.Calendar;
 /**
  * Created by cloudera on 4/3/17.
  */
+@DisallowConcurrentExecution
 public class HDFSQuotaFetcher implements Job {
     private final static String hdfsQuotaFile = DataFetcherMain.HDFS_QUOTA_FILE;
     private final static String hdfsQuotaAggregatedDir = DataFetcherMain.HDFS_QUOTA_AGGREGATED_DIR;
