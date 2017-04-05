@@ -3,10 +3,21 @@ package com.wipro.analytics.fetchers;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.Trigger;
+import org.quartz.impl.StdSchedulerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
 
 /**
  * Created by SR294224 on 3/20/2017.
@@ -15,8 +26,8 @@ public class DataFetcherMain {
 
     public static String FOLDERS_TO_MONITOR_FOR_HDFS_QUOTA;
     public static long START_DELAY;
-    public static long SCHEDULE_INTERVAL;
-    public static long AGGREGATION_INTERVAL;
+    public static int SCHEDULE_INTERVAL;
+    public static int AGGREGATION_INTERVAL;
     public static TimeUnit TIMEUNIT_FOR_SCHEDULE;
     public static String RUNNING_JOBS_FILE;
     public static String RUNNING_JOBS_AGGREGATED_DIR;
@@ -78,15 +89,62 @@ public class DataFetcherMain {
                 e.printStackTrace();
             }
 
+            // Grab the Scheduler instance from the Factory
+            Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+            // define the jobs and tie them to our classes
+            JobDetail finishedJob = newJob(FinishedJobsFetcher.class)
+                    .withIdentity("FinishedJobFetcher", "datafetcher")
+                    .build();
+            JobDetail runningJob = newJob(RunningJobsFetcher.class)
+                    .withIdentity("RunningJobFetcher", "datafetcher")
+                    .build();
+            JobDetail queueJob = newJob(QueueFetcher.class)
+                    .withIdentity("QueueFetcher", "datafetcher")
+                    .build();
+            JobDetail HDFSQuotaJob = newJob(HDFSQuotaFetcher.class)
+                    .withIdentity("HDFSQuotaFetcher", "datafetcher")
+                    .build();
 
-            FinishedJobsFetcher.schedule(START_DELAY, SCHEDULE_INTERVAL, TIMEUNIT_FOR_SCHEDULE);
-            RunningJobsFetcher.schedule(START_DELAY, SCHEDULE_INTERVAL, TIMEUNIT_FOR_SCHEDULE);
-            QueueFetcher.schedule(START_DELAY, SCHEDULE_INTERVAL, TIMEUNIT_FOR_SCHEDULE);
-            HDFSQuotaFetcher.schedule(START_DELAY, SCHEDULE_INTERVAL, TIMEUNIT_FOR_SCHEDULE);
-        }catch (Exception e){
+            // Trigger the job to run now, and then repeat every "SCHEDULE_INTERVAL" seconds
+            Trigger finishedJobTrigger = newTrigger()
+                    .withIdentity("FinishedJobTrigger", "datafetcher")
+                    .startNow()
+                    .withSchedule(simpleSchedule()
+                            .withIntervalInSeconds(SCHEDULE_INTERVAL)
+                            .repeatForever())
+                    .build();
+            Trigger runningJobTrigger = newTrigger()
+                    .withIdentity("RunningJobTrigger", "datafetcher")
+                    .startNow()
+                    .withSchedule(simpleSchedule()
+                            .withIntervalInSeconds(SCHEDULE_INTERVAL)
+                            .repeatForever())
+                    .build();
+            Trigger queueTrigger = newTrigger()
+                    .withIdentity("QueueTrigger", "datafetcher")
+                    .startNow()
+                    .withSchedule(simpleSchedule()
+                            .withIntervalInSeconds(SCHEDULE_INTERVAL)
+                            .repeatForever())
+                    .build();
+            Trigger HDFSQuotaTrigger = newTrigger()
+                    .withIdentity("HDFSQuotaTrigger", "datafetcher")
+                    .startNow()
+                    .withSchedule(simpleSchedule()
+                            .withIntervalInSeconds(SCHEDULE_INTERVAL)
+                            .repeatForever())
+                    .build();
+
+            // Tell quartz to schedule the job using our trigger
+            scheduler.scheduleJob(finishedJob, finishedJobTrigger);
+            scheduler.scheduleJob(runningJob, runningJobTrigger);
+            scheduler.scheduleJob(queueJob, queueTrigger);
+            scheduler.scheduleJob(HDFSQuotaJob, HDFSQuotaTrigger);
+            // and start it off
+            scheduler.start();
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
 
         }
     }
@@ -96,14 +154,14 @@ public class DataFetcherMain {
         InputStream input = null;
 
         try {
-            input = new FileInputStream(System.getProperty("user.home")+"/config.properties");
+            input = new FileInputStream(System.getProperty("user.home") + "/config.properties");
             properties.load(input);
 
             // get the properties value
             FOLDERS_TO_MONITOR_FOR_HDFS_QUOTA = properties.getProperty("FOLDERS_TO_MONITOR_FOR_HDFS_QUOTA");
             START_DELAY = Long.parseLong(properties.getProperty("START_DELAY"));
-            SCHEDULE_INTERVAL = Long.parseLong(properties.getProperty("SCHEDULE_INTERVAL"));
-            AGGREGATION_INTERVAL = Long.parseLong(properties.getProperty("AGGREGATION_INTERVAL"));
+            SCHEDULE_INTERVAL = Integer.parseInt(properties.getProperty("SCHEDULE_INTERVAL"));
+            AGGREGATION_INTERVAL = Integer.parseInt(properties.getProperty("AGGREGATION_INTERVAL"));
             TIMEUNIT_FOR_SCHEDULE = TimeUnit.valueOf(properties.getProperty("TIMEUNIT_FOR_SCHEDULE"));
             RUNNING_JOBS_FILE = properties.getProperty("RUNNING_JOBS_FILE");
             RUNNING_JOBS_AGGREGATED_DIR = properties.getProperty("RUNNING_JOBS_AGGREGATED_DIR");
@@ -117,19 +175,19 @@ public class DataFetcherMain {
             QUEUES_FILE = properties.getProperty("QUEUES_FILE");
             QUEUES_AGGREGATED_DIR = properties.getProperty("QUEUES_AGGREGATED_DIR");
             QUEUE_TABLE = properties.getProperty("QUEUE_TABLE");
-            RESOURCE_MANAGER_HOST= properties.getProperty("RESOURCE_MANAGER_HOST");
+            RESOURCE_MANAGER_HOST = properties.getProperty("RESOURCE_MANAGER_HOST");
             RESOURCE_MANAGER_PORT = properties.getProperty("RESOURCE_MANAGER_PORT");
             JOBHISTORY_SERVER_HOST = properties.getProperty("JOBHISTORY_SERVER_HOST");
             JOBHISTORY_SERVER_PORT = properties.getProperty("JOBHISTORY_SERVER_PORT");
-            NAMENODE_HOST =properties.getProperty("NAMENODE_HOST");
+            NAMENODE_HOST = properties.getProperty("NAMENODE_HOST");
             NAMENODE_PORT = properties.getProperty("NAMENODE_PORT");
-            HIVE_DRIVER_NAME= properties.getProperty("HIVE_DRIVER_NAME");
-            HIVE_USER= properties.getProperty("HIVE_USER");
-            HIVE_PASSWORD= properties.getProperty("HIVE_PASSWORD");
-            FILE_LINE_SEPERATOR= properties.getProperty("FILE_LINE_SEPERATOR");
-            FILE_FIELD_SEPERATOR= properties.getProperty("FILE_FIELD_SEPERATOR");
+            HIVE_DRIVER_NAME = properties.getProperty("HIVE_DRIVER_NAME");
+            HIVE_USER = properties.getProperty("HIVE_USER");
+            HIVE_PASSWORD = properties.getProperty("HIVE_PASSWORD");
+            FILE_LINE_SEPERATOR = properties.getProperty("FILE_LINE_SEPERATOR");
+            FILE_FIELD_SEPERATOR = properties.getProperty("FILE_FIELD_SEPERATOR");
             DATABASE_NAME = properties.getProperty("DATABASE_NAME");
-            HIVE_CONNECTION_URL= properties.getProperty("HIVE_CONNECTION_URL");
+            HIVE_CONNECTION_URL = properties.getProperty("HIVE_CONNECTION_URL");
 
 
         } catch (IOException io) {

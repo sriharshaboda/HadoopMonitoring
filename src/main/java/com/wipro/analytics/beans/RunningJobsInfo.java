@@ -3,7 +3,6 @@ package com.wipro.analytics.beans;
 import com.wipro.analytics.fetchers.DataFetcherMain;
 
 import java.io.Serializable;
-import java.sql.Time;
 import java.sql.Timestamp;
 
 /**
@@ -175,11 +174,11 @@ public class RunningJobsInfo implements Serializable {
         this.timestamp = timestamp;
     }
 
-    
+
     @Override
     public String toString() {
-        String fieldDelimiter= DataFetcherMain.FILE_FIELD_SEPERATOR;
-        return    applicationId + fieldDelimiter
+        String fieldDelimiter = DataFetcherMain.FILE_FIELD_SEPERATOR;
+        return applicationId + fieldDelimiter
                 + applicationName + fieldDelimiter
                 + applicationState + fieldDelimiter
                 + applicationType + fieldDelimiter

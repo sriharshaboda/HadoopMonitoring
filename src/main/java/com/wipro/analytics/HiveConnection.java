@@ -1,13 +1,15 @@
 package com.wipro.analytics;
 
 import com.wipro.analytics.fetchers.DataFetcherMain;
-
-import java.sql.*;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Created by cloudera on 3/19/17.
@@ -23,6 +25,7 @@ public class HiveConnection {
     private static final String HIVE_CONNECTION_URL = DataFetcherMain.HIVE_CONNECTION_URL;
     private static final String NAME_NODE_HOST = DataFetcherMain.NAMENODE_HOST;
     private static final String NAME_NODE_PORT = DataFetcherMain.NAMENODE_PORT;
+
     public static Connection getHiveJDBCConnection(String dbName, String hiveConnection) throws SQLException {
         try {
             Class.forName(HIVE_DRIVER_NAME);
@@ -44,45 +47,41 @@ public class HiveConnection {
     }
 
 
-    public void loadIntoHive(String filename, String tableName){
+    public void loadIntoHive(String filename, String tableName) {
         try {
 
-	        Configuration conf = new Configuration();
-            conf.set("fs.defaultFS","hdfs://"+NAME_NODE_HOST+":"+NAME_NODE_PORT);
+            Configuration conf = new Configuration();
+            conf.set("fs.defaultFS", "hdfs://" + NAME_NODE_HOST + ":" + NAME_NODE_PORT);
             FileSystem fs = FileSystem.get(conf);
-		    File sourceFile = new File(filename);
-            fs.copyFromLocalFile(new Path(sourceFile.getPath()),new Path("/tmp/"+tableName,sourceFile.getName()));
-            String hdfsDir="/tmp/"+tableName;
+            File sourceFile = new File(filename);
+            fs.copyFromLocalFile(new Path(sourceFile.getPath()), new Path("/tmp/" + tableName, sourceFile.getName()));
+            String hdfsDir = "/tmp/" + tableName;
 
-            Connection conn = getHiveJDBCConnection(DBNAME,HIVE_CONNECTION_URL);
+            Connection conn = getHiveJDBCConnection(DBNAME, HIVE_CONNECTION_URL);
             Statement stmt = conn.createStatement();
-            String stageLoadQuery = "LOAD DATA INPATH '" + hdfsDir + "' OVERWRITE INTO TABLE " + tableName +"_STG";
+            String stageLoadQuery = "LOAD DATA INPATH '" + hdfsDir + "' OVERWRITE INTO TABLE " + tableName + "_STG";
             System.out.println("stageLoadQuery = " + stageLoadQuery);
             stmt.executeUpdate(stageLoadQuery);
 
             String insertDataQuery = "";
-            if(tableName.equalsIgnoreCase("FINISHED_JOBS")){
-                insertDataQuery = "INSERT   INTO TABLE "+ tableName+" PARTITION(fetchdate, fetchhour) SELECT id ,name , queue , username , state , submitTime , startTime , finishTime ,avgMapTime , avgReduceTime , avgShuffleTime , avgMergeTime , gcTime , usedPhysicalMemory ,  cpuTimeSpentMaps , cpuTimeSpentReducers , cpuTimeSpentTotal ,vCoreSecondsMaps, vCoreSecondsReducers, memorySecondsMaps,memorySecondsReducers,  slotsTimeMaps,slotsTimeReducers, totalFileBytesRead    ,totalFileBytesWritten   ,totalFileReadOps   ,  totalFileLargeReadOps   ,totalFileWriteOps   ,totalHDFSBytesRead   ,totalHDFSBytesWritten   ,totalHDFSReadOps   ,  totalHDFSLargeReadOps   ,totalHDFSWriteOps ,actionId, workflowId, fetchTime ,to_date(fetchTime), hour(fetchTime) FROM "+tableName+"_STG";
-            }
-            else if(tableName.equalsIgnoreCase("RUNNING_JOBS")){
-                insertDataQuery = "INSERT INTO TABLE "+ tableName+" PARTITION(fetchdate, fetchhour) SELECT applicationId ,applicationName , applicationState , applicationType , finalState , progress , username , queueName  , startTime , elapsedTime , finishTime , trackingUrl , numContainers , allocatedMB , allocatedVCores , memorySeconds , vcoreSeconds  , fetchTime ,to_date(fetchTime), hour(fetchTime) FROM "+tableName+"_STG";
-            }
-
-            else if(tableName.equalsIgnoreCase("QUEUES")){
-                insertDataQuery = "INSERT INTO TABLE "+ tableName+" PARTITION(fetchdate, fetchhour) SELECT queueName , absoluteAllocatedCapacity , absoluteUsedCapacity , usedMemory , usedCores , numContainers , queueState , maxApplications , numApplications , numActiveApplications , numPendingApplications  , queueType , users , fetchTime ,to_date(fetchTime), hour(fetchTime) FROM "+tableName+"_STG";
-            }
-            else if(tableName.equalsIgnoreCase("HDFS_QUOTA")){
-                insertDataQuery = "INSERT INTO TABLE "+ tableName+" PARTITION(fetchdate, fetchhour) SELECT hdfspath , quota , numFiles , spaceQuota , spaceConsumed , fetchTime ,to_date(fetchTime), hour(fetchTime) FROM "+tableName+"_STG";
+            if (tableName.equalsIgnoreCase("FINISHED_JOBS")) {
+                insertDataQuery = "INSERT   INTO TABLE " + tableName + " PARTITION(fetchdate, fetchhour) SELECT id ,name , queue , username , state , submitTime , startTime , finishTime ,avgMapTime , avgReduceTime , avgShuffleTime , avgMergeTime , gcTime , usedPhysicalMemory ,  cpuTimeSpentMaps , cpuTimeSpentReducers , cpuTimeSpentTotal ,vCoreSecondsMaps, vCoreSecondsReducers, memorySecondsMaps,memorySecondsReducers,  slotsTimeMaps,slotsTimeReducers, totalFileBytesRead    ,totalFileBytesWritten   ,totalFileReadOps   ,  totalFileLargeReadOps   ,totalFileWriteOps   ,totalHDFSBytesRead   ,totalHDFSBytesWritten   ,totalHDFSReadOps   ,  totalHDFSLargeReadOps   ,totalHDFSWriteOps ,actionId, workflowId, fetchTime ,to_date(fetchTime), hour(fetchTime) FROM " + tableName + "_STG";
+            } else if (tableName.equalsIgnoreCase("RUNNING_JOBS")) {
+                insertDataQuery = "INSERT INTO TABLE " + tableName + " PARTITION(fetchdate, fetchhour) SELECT applicationId ,applicationName , applicationState , applicationType , finalState , progress , username , queueName  , startTime , elapsedTime , finishTime , trackingUrl , numContainers , allocatedMB , allocatedVCores , memorySeconds , vcoreSeconds  , fetchTime ,to_date(fetchTime), hour(fetchTime) FROM " + tableName + "_STG";
+            } else if (tableName.equalsIgnoreCase("QUEUES")) {
+                insertDataQuery = "INSERT INTO TABLE " + tableName + " PARTITION(fetchdate, fetchhour) SELECT queueName , absoluteAllocatedCapacity , absoluteUsedCapacity , usedMemory , usedCores , numContainers , queueState , maxApplications , numApplications , numActiveApplications , numPendingApplications  , queueType , users , fetchTime ,to_date(fetchTime), hour(fetchTime) FROM " + tableName + "_STG";
+            } else if (tableName.equalsIgnoreCase("HDFS_QUOTA")) {
+                insertDataQuery = "INSERT INTO TABLE " + tableName + " PARTITION(fetchdate, fetchhour) SELECT hdfspath , quota , numFiles , spaceQuota , spaceConsumed , fetchTime ,to_date(fetchTime), hour(fetchTime) FROM " + tableName + "_STG";
             }
             System.out.println("insertDataQuery = " + insertDataQuery);
             stmt.executeUpdate(insertDataQuery);
-            
-            
+
+
             sourceFile.delete();
             stmt.close();
             conn.close();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

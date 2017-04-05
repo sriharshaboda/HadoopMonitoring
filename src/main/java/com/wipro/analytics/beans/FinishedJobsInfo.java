@@ -18,7 +18,7 @@ public class FinishedJobsInfo implements Serializable {
     private long submitTime;
     private long startTime;
     private long finishTime;
-    private long avgMapTime ;
+    private long avgMapTime;
     private long avgReduceTime;
     private long avgShuffleTime;
     private long avgMergeTime;
@@ -54,6 +54,7 @@ public class FinishedJobsInfo implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
+
     public String getName() {
         return name;
     }
@@ -336,43 +337,43 @@ public class FinishedJobsInfo implements Serializable {
     }
 
     @Override
-    public String toString(){
-        String fieldDelimiter= DataFetcherMain.FILE_FIELD_SEPERATOR;
-        return  id+ fieldDelimiter
-                +name+ fieldDelimiter
-                +queue+ fieldDelimiter
-                + user+ fieldDelimiter
-                +state+ fieldDelimiter
-                +submitTime+ fieldDelimiter
-                +startTime+ fieldDelimiter
-                +finishTime+ fieldDelimiter
-                +avgMapTime + fieldDelimiter
-                +avgReduceTime+ fieldDelimiter
-                +avgShuffleTime+ fieldDelimiter
-                +avgMergeTime+ fieldDelimiter
-                +gcTime+ fieldDelimiter
-                +usedPhysicalMemory+ fieldDelimiter
-                +cpuTimeSpentMaps+ fieldDelimiter
-                +cpuTimeSpentReducers+ fieldDelimiter
-                +cpuTimeSpentTotal+ fieldDelimiter
-                +vCoreSecondsMaps+ fieldDelimiter
-                +vCoreSecondsReducers+ fieldDelimiter
-                +memorySecondsMaps+ fieldDelimiter
-                +memorySecondsReducers+ fieldDelimiter
-                +slotsTimeMaps+ fieldDelimiter
-                +slotsTimeReducers+ fieldDelimiter
-                +totalFileBytesRead+ fieldDelimiter
-                +totalFileBytesWritten+ fieldDelimiter
-                +totalFileReadOps+ fieldDelimiter
-                +totalFileLargeReadOps+ fieldDelimiter
-                +totalFileWriteOps+ fieldDelimiter
-                +totalHDFSBytesRead+ fieldDelimiter
-                +totalHDFSBytesWritten+ fieldDelimiter
-                +totalHDFSReadOps+ fieldDelimiter
-                +totalHDFSLargeReadOps+ fieldDelimiter
-                +totalHDFSWriteOps+ fieldDelimiter
-                +actionId+ fieldDelimiter
-                +workflowId+ fieldDelimiter
-                +timestamp;
+    public String toString() {
+        String fieldDelimiter = DataFetcherMain.FILE_FIELD_SEPERATOR;
+        return id + fieldDelimiter
+                + name + fieldDelimiter
+                + queue + fieldDelimiter
+                + user + fieldDelimiter
+                + state + fieldDelimiter
+                + submitTime + fieldDelimiter
+                + startTime + fieldDelimiter
+                + finishTime + fieldDelimiter
+                + avgMapTime + fieldDelimiter
+                + avgReduceTime + fieldDelimiter
+                + avgShuffleTime + fieldDelimiter
+                + avgMergeTime + fieldDelimiter
+                + gcTime + fieldDelimiter
+                + usedPhysicalMemory + fieldDelimiter
+                + cpuTimeSpentMaps + fieldDelimiter
+                + cpuTimeSpentReducers + fieldDelimiter
+                + cpuTimeSpentTotal + fieldDelimiter
+                + vCoreSecondsMaps + fieldDelimiter
+                + vCoreSecondsReducers + fieldDelimiter
+                + memorySecondsMaps + fieldDelimiter
+                + memorySecondsReducers + fieldDelimiter
+                + slotsTimeMaps + fieldDelimiter
+                + slotsTimeReducers + fieldDelimiter
+                + totalFileBytesRead + fieldDelimiter
+                + totalFileBytesWritten + fieldDelimiter
+                + totalFileReadOps + fieldDelimiter
+                + totalFileLargeReadOps + fieldDelimiter
+                + totalFileWriteOps + fieldDelimiter
+                + totalHDFSBytesRead + fieldDelimiter
+                + totalHDFSBytesWritten + fieldDelimiter
+                + totalHDFSReadOps + fieldDelimiter
+                + totalHDFSLargeReadOps + fieldDelimiter
+                + totalHDFSWriteOps + fieldDelimiter
+                + actionId + fieldDelimiter
+                + workflowId + fieldDelimiter
+                + timestamp;
     }
 }

@@ -4,7 +4,6 @@ import com.wipro.analytics.fetchers.DataFetcherMain;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.List;
 
 /**
  * Created by cloudera on 3/19/17.
@@ -140,23 +139,23 @@ public class QueueInfo implements Serializable {
     }
 
     @Override
-    public String toString(){
-        String fieldDelimiter= DataFetcherMain.FILE_FIELD_SEPERATOR;
+    public String toString() {
+        String fieldDelimiter = DataFetcherMain.FILE_FIELD_SEPERATOR;
         return
-                queueName+ fieldDelimiter
-                + absoluteAllocatedCapacity+ fieldDelimiter
-                + absoluteUsedCapacity+ fieldDelimiter
-                + usedMemory+ fieldDelimiter
-                + usedCores+ fieldDelimiter
-                + numContainers+ fieldDelimiter
-                + queueState+ fieldDelimiter
-                + maxApplications+ fieldDelimiter
-                + numApplications+ fieldDelimiter
-                + numActiveApplications+ fieldDelimiter
-                + numPendingApplications+ fieldDelimiter
-                + queueType+ fieldDelimiter
-                + users+ fieldDelimiter
-                + timestamp;
+                queueName + fieldDelimiter
+                        + absoluteAllocatedCapacity + fieldDelimiter
+                        + absoluteUsedCapacity + fieldDelimiter
+                        + usedMemory + fieldDelimiter
+                        + usedCores + fieldDelimiter
+                        + numContainers + fieldDelimiter
+                        + queueState + fieldDelimiter
+                        + maxApplications + fieldDelimiter
+                        + numApplications + fieldDelimiter
+                        + numActiveApplications + fieldDelimiter
+                        + numPendingApplications + fieldDelimiter
+                        + queueType + fieldDelimiter
+                        + users + fieldDelimiter
+                        + timestamp;
     }
 
 }

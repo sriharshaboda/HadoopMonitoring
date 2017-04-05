@@ -67,10 +67,10 @@ public class HDFSQuotaInfo {
     }
 
     @Override
-    public String toString(){
-        String fieldDelimiter= DataFetcherMain.FILE_FIELD_SEPERATOR;
+    public String toString() {
+        String fieldDelimiter = DataFetcherMain.FILE_FIELD_SEPERATOR;
 
-        return    hdfsPath + fieldDelimiter
+        return hdfsPath + fieldDelimiter
                 + quota + fieldDelimiter
                 + numFiles + fieldDelimiter
                 + spaceQuota + fieldDelimiter
